@@ -100,7 +100,7 @@ render(conn, "post.json", post: post)
 
 This is the result that you can use to return from PhoenixController
 
-```json
+```elixir
 %{
 	title: "Hello JsonView",
 	excerpt: "Now you can render Json easier",
