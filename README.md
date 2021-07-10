@@ -42,6 +42,13 @@ Documentation can be found at [https://hexdocs.pm/json_view](https://hexdocs.pm/
   Or you can use it directly on your view
 
 ```elixir
+  defmodule MyApp.UserView do
+      use JsonView
+      def render("user.json", %{user: user}) do
+      	render_json(user, [:first_name, :last_name, :vatar], [], [])
+      end
+  end
+      
   defmodule MyApp.PostView do
       use JsonView
 
@@ -50,7 +57,7 @@ Documentation can be found at [https://hexdocs.pm/json_view](https://hexdocs.pm/
       # define which fields that need to format or calculate, you have to define `render_field/2` below
       @custom_fields [:like_count]
       # define which view used to render relationship
-      @relationships [author: MyApp.AuthorView]
+      @relationships [author: MyApp.UserView]
 
       def render("post.json", %{post: post}) do
           # 1st way if `use JsonView`
@@ -63,7 +70,56 @@ Documentation can be found at [https://hexdocs.pm/json_view](https://hexdocs.pm/
   end
 ```
 
-**How to define fields and relationships**
+And then use it
+
+```elixir
+post = %Post{
+	title: "Hello JsonView",
+	excerpt: "Now you can render Json easier",
+	content: "Install and put it to work",
+	cover: nil,
+	inserted_at: ~N[2021-07-05 00:00:00],
+	updated_at: ~N[2021-07-09 00:00:00],
+	author: %User{
+		first_name: "Daniel",
+		last_name: "James",
+		email: "daniel@example.com",
+		avatar: nil,
+		inserted_at: ~N[2021-06-30 00:00:00]
+		updated_at: ~N[2021-07-02 00:00:00]
+	}
+}
+
+MyApp.PostView.render("post.json", %{post: post})
+
+# or invoke from PostController
+render(conn, "post.json", post: post)
+```
+
+
+
+This is the result that you can use to return from PhoenixController
+
+```json
+%{
+	title: "Hello JsonView",
+	excerpt: "Now you can render Json easier",
+	content: "Install and put it to work",
+	cover: nil,
+  like_count: nil,
+	author: %{
+		first_name: "Daniel",
+		last_name: "James"
+	}
+}
+```
+
+
+
+
+
+## How to define fields and relationships
+
 - **Custom field**
 
   ```elixir
@@ -84,12 +140,15 @@ Documentation can be found at [https://hexdocs.pm/json_view](https://hexdocs.pm/
   # this invokes `MyApp.UserView.render("basic_profile.json", %{user: user})`
   ```
 
-**Data override**
+
+
+## Data override
 
   `JsonView` render `fields` -> `custom_fields` -> `relationships`. If they define same field, then the latter will override the prior
 
 
-**Default fields**
+
+## Default fields
 
   You can pass a list of default `fields` and/or `custom_fields` as options to `use JsonView`. These fields then merged to `fields` and `custom_fields` before rendering data each time you invoke `render_json`
 
@@ -97,7 +156,9 @@ Documentation can be found at [https://hexdocs.pm/json_view](https://hexdocs.pm/
   use JsonView, fields: [:id, :updated_at], custom_fields: [inserted_at: &to_local_time/2]
 ```
 
-**Render hook**
+
+
+## Render hook
 
   You can pass a function to process data after `JsonView` completes rendering like this:
 

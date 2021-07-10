@@ -90,7 +90,7 @@ defmodule JsonView do
     after_render = Keyword.get(opts, :after_render)
 
     quote do
-      def render_json(struct, fields, custom_fields, relationships) do
+      def render_json(struct, fields, custom_fields \\ [], relationships \\ []) do
         data =
           JsonView.render_json(struct, __MODULE__,
             fields: unquote(fields) ++ fields,
