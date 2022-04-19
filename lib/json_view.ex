@@ -105,7 +105,7 @@ defmodule JsonView do
         end
       end
 
-      def render_view(struct, view, template) do
+      def render_view(struct, view, template \\ nil) do
         JsonView.render_template(struct, view, template)
       end
     end
