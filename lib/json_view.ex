@@ -199,14 +199,16 @@ defmodule JsonView do
 
   def render_relationship(struct, field, view) do
     references = Map.get(struct, field)
-    name = get_resource_name(view)
-    render_template(references, view, "#{name}.json")
+
+    render_template(references, view)
   end
 
   @doc """
   Decide how to render the resource depend on type of resource
   """
-  def render_template(resource, view, template) do
+  def render_template(resource, view, template \\ nil) do
+    template = template || "#{get_resource_name(view)}.json"
+
     case resource do
       %{__struct__: struct} when struct == Ecto.Association.NotLoaded ->
         nil
